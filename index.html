@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<meta charset="UTF-8">
+		<meta name="viewport"
+		      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>Форма Регистрации</title>
+		<link rel="stylesheet" href="assets/css/reset.css">
+		<link rel="stylesheet" href="assets/css/index.css">
+		<link rel="stylesheet" href="assets/css/intlTelInput.css">
+</head>
+<body>
+<section class="screen register-screen">
+		<div class="register-screen_content">
+				<h2>Регистрация</h2>
+				<form method="post" action="https://api.topmediagroups.com/api/v1/users">
+						<label>
+								<input id="fName" type="text" name="name" value="" placeholder="Имя" >
+						</label>
+						<label>
+								<input id="lName" type="text" name="lname" value=""  placeholder="Фамилия">
+						</label>
+						<label>
+								<input id="emil" type="email" name="email" value="" placeholder="email">
+						</label>
+						<label>
+								<input id="phoneNumber" type="tel" name="phone" value="">
+						</label>
+						<label>
+								<input id="pass" type="password" name="password" value="" placeholder="Password">
+						</label>
+						<label>
+								<input id="country" type="text" name="country" value="" placeholder="Страна">
+						</label>
+						<button id="pushData" type="submit">Зарегистрироваться</button>
+				
+				</form>
+		</div>
+</section>
+<section class="screen login-screen">
+		<div class="login-screen_content">
+				<h2>Вход</h2>
+				<form action="https://api.topmediagroups.com/api/v1/users" method="post">
+						<label>
+								<input id="login" type="text" name="typeLogin" value="" placeholder="Email">
+						</label>
+						<label>
+								<input id="passToLogin" type="password" name="passwordtoLogin" value="" placeholder="Pass">
+						</label>
+						<button id="pushLogin" type="submit" >Войти</button>
+				</form>
+		</div>
+</section>
+<section class="screen update-screen">
+		<div class="update-screen_content">
+				<h2>Добавить</h2>
+				<form action="https://api.topmediagroups.com/api/v1/tasks" method="post">
+						<label>
+								<input id="loginUpdate" type="text" name="name" value="" placeholder="Имя" required>
+								<input id="loginUpdateLname" type="text" name="lname" value="" placeholder="Фамилия" required>
+						</label>
+						<label>
+								<input id="typeUpdate" type="text" name="typeUpdate" placeholder="description">
+						</label>
+						<button id="pushUpdate" type="submit" >Войти</button>
+				</form>
+		</div>
+</section>
+
+<script src="assets/js/registration.js"></script>
+<script src="assets/js/login.js"></script>
+<script src="assets/js/update.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.0/js/intlTelInput.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/4.0.8/jquery.inputmask.bundle.min.js"></script>
+<script>
+    $(function () {
+        let input = document.querySelectorAll("input[name=phone]");
+        let iti_el = $('.iti.iti--allow-dropdown.iti--separate-dial-code');
+        if(iti_el.length){
+            iti.destroy();
+        }
+        for(let i = 0; i < input.length; i++){
+            iti = intlTelInput(input[i], {
+                //autoHideDialCode: false,
+                defaultCountry: "ua",
+                autoPlaceholder: "aggressive" ,
+                //initialCountry: "auto",
+                separateDialCode: true,
+                preferredCountries: ['ua', 'us', 'ru'],
+                customPlaceholder:function(selectedCountryPlaceholder,selectedCountryData){
+                    return ''+selectedCountryPlaceholder.replace(/[0-9]/g,'x');
+                },
+                geoIpLookup: function(callback) {
+                    $.get('https://ipinfo.io', function() {}, "jsonp").always(function(resp) {
+                        let countryCode = (resp && resp.country) ? resp.country : "";
+                        callback(countryCode);
+                    });
+                },
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.0/js/utils.js" // just for
+            });
+
+
+            $('input[name="phone"]').on("focus click countrychange", function(e, countryData) {
+
+                let pl = $(this).attr('placeholder') + '';
+                let res = pl.replace( /x/g ,'9');
+                if(res !== 'undefined'){
+                    $(this).inputmask(res, {placeholder: "x", clearMaskOnLostFocus: true});
+                }
+		            
+
+            });
+
+            $('input[name="phone"]').on("focusout", function(e, countryData) {
+                let intlNumber = iti.getNumber();
+                console.log(intlNumber);
+            });
+
+        }
+
+
+    });
+    
+</script>
+</body>
+</html>
